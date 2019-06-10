@@ -16,9 +16,15 @@
     <ClInclude Include="pthread\unistd.h">
       <Filter>pthread</Filter>
     </ClInclude>
+    <ClInclude Include="Queue.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Queue.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
