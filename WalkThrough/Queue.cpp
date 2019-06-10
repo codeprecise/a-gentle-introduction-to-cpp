@@ -4,15 +4,14 @@
 #include <stdlib.h>
 #include <string.h>
 
-Queue::Queue(int maxElementCount, int elementSize)
+Queue::Queue(int maxElementCount, int elementSize) :
+    _elementSize (elementSize),
+    _maxElementCount (maxElementCount),
+    _elementCount (0),
+    _writeIndex (0),
+    _readIndex (0),
+    _elements ((char*)malloc(maxElementCount * (size_t)elementSize))
 {
-    _elementSize = elementSize;
-    _maxElementCount = maxElementCount;
-    _elementCount = 0;
-    _writeIndex = 0;
-    _readIndex = 0;
-
-    _elements = (char*)malloc(maxElementCount * (size_t)elementSize);
 }
 
 Queue::~Queue()

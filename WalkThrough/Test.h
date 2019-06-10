@@ -6,7 +6,6 @@ class Test
 public:
 
     Test();
-    ~Test();
 
     bool IsOk();
     bool RunThreads();
@@ -21,9 +20,9 @@ private:
 
     const int size = 1000;
 
-    Queue* sourceQueue = NULL;
-    Queue* evenQueue = NULL;
-    Queue* oddQueue = NULL;
+    Queue sourceQueue;
+    Queue evenQueue;
+    Queue oddQueue;
 
     volatile int shouldExit = 0;
 };

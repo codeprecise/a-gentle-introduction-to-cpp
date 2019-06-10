@@ -3,42 +3,16 @@
 #include <unistd.h>
 #include <time.h>
 
-Test::Test()
+Test::Test() :
+    sourceQueue(size, sizeof(int)),
+    evenQueue(size, sizeof(int) / 2),
+    oddQueue(size, sizeof(int) / 2)
 {
-    sourceQueue = new Queue(size, sizeof(int));
-    if (!sourceQueue) {
-        return;
-    }
-
-    evenQueue = new Queue(size / 2, sizeof(int));
-    if (!evenQueue) {
-        return;
-    }
-    
-    oddQueue = new Queue(size / 2, sizeof(int));
-    if (!oddQueue) {
-        return;
-    }
-}
-
-Test::~Test()
-{
-    if (sourceQueue) {
-        delete sourceQueue;
-    }
-     
-    if (evenQueue) {
-        delete evenQueue;
-    }
-
-    if (oddQueue) {
-        delete oddQueue;
-    }
 }
 
 bool Test::IsOk()
 {
-    return sourceQueue != NULL;
+    return true;
 }
 
 void Test::ProducerMethod()
@@ -47,7 +21,7 @@ void Test::ProducerMethod()
     {
         int rand = clock() % 7;
         usleep(rand * 1000);
-        sourceQueue->Enqueue(&i);
+        sourceQueue.Enqueue(&i);
     }
 }
 
@@ -59,19 +33,19 @@ void Test::ConsumerMethod()
         usleep(rand * 1000);
 
         int value;
-        int gotValue = sourceQueue->Dequeue(&value);
+        int gotValue = sourceQueue.Dequeue(&value);
         if (gotValue)
         {
             if (value % 2 == 0)
             {
-                evenQueue->Enqueue(&value);
+                evenQueue.Enqueue(&value);
             }
             else
             {
-                oddQueue->Enqueue(&value);
+                oddQueue.Enqueue(&value);
             }
         }
-        else if (evenQueue->GetSize() + oddQueue->GetSize() == size)
+        else if (evenQueue.GetSize() + oddQueue.GetSize() == size)
         {
             break;
         }
@@ -105,8 +79,8 @@ bool Test::RunThreads()
 
 bool Test::IsPassed()
 {
-    int evenSize = evenQueue->GetSize();
-    int oddSize = oddQueue->GetSize();
+    int evenSize = evenQueue.GetSize();
+    int oddSize = oddQueue.GetSize();
 
     bool passed =
         evenSize == (size_t)(size / 2) &&
@@ -122,13 +96,13 @@ bool Test::IsPassed()
 
     for (int i = 0; i < evenSize; i++)
     {
-        evenQueue->Dequeue(&value);
+        evenQueue.Dequeue(&value);
         sum += value;
     }
 
     for (int i = 0; i < oddSize; i++)
     {
-        oddQueue->Dequeue(&value);
+        oddQueue.Dequeue(&value);
         sum += value;
     }
 
