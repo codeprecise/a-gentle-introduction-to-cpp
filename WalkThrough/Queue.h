@@ -6,6 +6,13 @@ typedef void* ElementPtr;
 
 typedef struct Queue
 {
+    Queue(int maxElementCount, int elementSize);
+    ~Queue();
+    
+    int GetSize();
+    int Enqueue(ElementPtr element);
+    int Dequeue(ElementPtr element);
+
     int _elementSize;
     int _maxElementCount;
     int _elementCount;
@@ -15,9 +22,3 @@ typedef struct Queue
 
     pthread_mutex_t _mutex;
 } Queue;
-
-Queue* CreateQueue(int maxElementCount, int elementSize);
-void DeleteQueue(Queue* queue);
-int GetSize(Queue* queue);
-int Enqueue(Queue* queue, ElementPtr element);
-int Dequeue(Queue* queue, ElementPtr element);

@@ -2,10 +2,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <pthread.h>
-#include <time.h>
 #include <unistd.h>
+#include <time.h>
 
 const int size = 1000;
 
@@ -20,15 +18,15 @@ pthread_t consumer2Thread = 0;
 
 int Initialize()
 {
-    sourceQueue = CreateQueue(size, sizeof(int));
+    sourceQueue = new Queue(size, sizeof(int));
     if (!sourceQueue) {
         return 0;
     }
-    evenQueue = CreateQueue(size / 2, sizeof(int));
+    evenQueue = new Queue(size / 2, sizeof(int));
     if (!evenQueue) {
         return 0;
     }
-    oddQueue = CreateQueue(size / 2, sizeof(int));
+    oddQueue = new Queue(size / 2, sizeof(int));
     if (!oddQueue) {
         return 0;
     }
@@ -38,17 +36,17 @@ int Initialize()
 void Release()
 {
     if (sourceQueue) {
-        DeleteQueue(sourceQueue);
+        delete sourceQueue;
     }
 
     if (evenQueue) {
-        DeleteQueue(evenQueue);
+        delete evenQueue;
     }
     
     if (oddQueue) {
-        DeleteQueue(oddQueue);
+        delete oddQueue;
     }
-
+    
     if (producerThread) {
         pthread_join(producerThread, NULL);
     }
@@ -69,7 +67,7 @@ void* ProducerMethod(void* arg)
     {
         int rand = clock() % 7;
         usleep(rand * 1000);
-        Enqueue(sourceQueue, &i);
+        sourceQueue->Enqueue(&i);
     }
 
     return NULL;
@@ -84,19 +82,19 @@ void* ConsumerMethod(void* arg)
         usleep(rand * 1000);
 
         int value;
-        int gotValue = Dequeue(sourceQueue, &value);
+        int gotValue = sourceQueue->Dequeue(&value);
         if (gotValue)
         {
             if (value % 2 == 0)
             {
-                Enqueue(evenQueue, &value);
+                evenQueue->Enqueue(&value);
             }
             else
             {
-                Enqueue(oddQueue, &value);
+                oddQueue->Enqueue(&value);
             }
         }
-        else if (GetSize(evenQueue) + GetSize(oddQueue) == size)
+        else if (evenQueue->GetSize() + oddQueue->GetSize() == size)
         {
             break;
         }
@@ -151,22 +149,22 @@ int main()
     consumer2Thread = 0;
 
     passed =
-        GetSize(evenQueue) == (size_t)(size / 2) &&
-        GetSize(oddQueue) == (size_t)(size / 2);
+        evenQueue->GetSize() == (size_t)(size / 2) &&
+        oddQueue->GetSize() == (size_t)(size / 2);
 
     if (passed)
     {
-        int evenSize = GetSize(evenQueue);
+        int evenSize = evenQueue->GetSize();
         for (int i = 0; i < evenSize; i++)
         {
-            Dequeue(evenQueue, &value);
+            evenQueue->Dequeue(&value);
             sum += value;
         }
 
-        int oddSize = GetSize(oddQueue);
+        int oddSize = oddQueue->GetSize();
         for (int i = 0; i < oddSize; i++)
         {
-            Dequeue(oddQueue, &value);
+            oddQueue->Dequeue(&value);
             sum += value;
         }
 
@@ -178,6 +176,7 @@ int main()
     printf("=========== %s\n", passed ? "PASSED" : "FAILED");
 
     Release();
+
     return EXIT_SUCCESS;
 
 Error:
