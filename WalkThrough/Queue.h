@@ -1,6 +1,6 @@
 #pragma once
 
-#include <pthread.h>
+#include "Mutex.h"
 
 typedef void* ElementPtr;
 
@@ -26,5 +26,5 @@ private:
     int _readIndex;
     char* _elements;
 
-    pthread_mutex_t _mutex;
+    Mutex _mutex;
 };
