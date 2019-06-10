@@ -22,6 +22,9 @@ typedef struct Queue
 Queue* CreateQueue(int maxElementCount, int elementSize)
 {
     Queue* queue = (Queue*)malloc(sizeof(struct Queue));
+    if (queue == 0) {
+        return 0;
+    }
 
     int result = pthread_mutex_init(&queue->_mutex, 0);
     if (result != 0)
@@ -36,7 +39,7 @@ Queue* CreateQueue(int maxElementCount, int elementSize)
     queue->_writeIndex = 0;
     queue->_readIndex = 0;
     
-    queue->_elements = (char*)malloc(maxElementCount * elementSize);
+    queue->_elements = (char*)malloc(maxElementCount * (size_t)elementSize);
     if (queue->_elements == NULL)
     {
         (void)pthread_mutex_destroy(&queue->_mutex);
@@ -82,7 +85,7 @@ int Enqueue(Queue* queue, ElementPtr element)
         return 0;
     }
 
-    memcpy(queue->_elements + queue->_writeIndex * queue->_elementSize, element, queue->_elementSize);
+    memcpy(queue->_elements + queue->_writeIndex * (size_t)queue->_elementSize, element, queue->_elementSize);
 
     queue->_writeIndex = (queue->_writeIndex + 1) % queue->_maxElementCount;
 
@@ -106,7 +109,7 @@ int Dequeue(Queue * queue, ElementPtr element)
         return 0;
     }
 
-    memcpy(element, queue->_elements + queue->_readIndex * queue->_elementSize, queue->_elementSize);
+    memcpy(element, queue->_elements + queue->_readIndex * (size_t) queue->_elementSize, queue->_elementSize);
     queue->_readIndex = (queue->_readIndex + 1) % queue->_maxElementCount;
 
     queue->_elementCount--;
@@ -146,12 +149,17 @@ int Initialize()
 void Release()
 {
     if (sourceQueue) {
-        DeleteQueue(oddQueue);
+        DeleteQueue(sourceQueue);
     }
+
     if (evenQueue) {
         DeleteQueue(evenQueue);
     }
     
+    if (oddQueue) {
+        DeleteQueue(oddQueue);
+    }
+
     if (producerThread) {
         pthread_join(producerThread, NULL);
     }
@@ -280,6 +288,7 @@ int main()
 
     printf("=========== %s\n", passed ? "PASSED" : "FAILED");
 
+    Release();
     return EXIT_SUCCESS;
 
 Error:
