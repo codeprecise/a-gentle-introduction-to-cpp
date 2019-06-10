@@ -17,7 +17,7 @@ Queue::Queue(int maxElementCount, int elementSize)
     _writeIndex = 0;
     _readIndex = 0;
 
-    _elements = (char*)malloc(maxElementCount * (size_t)elementSize);
+    _elements = (char*)malloc(maxElementCount * (size_t) elementSize);
     if (_elements == NULL)
     {
         (void)pthread_mutex_destroy(&_mutex);
@@ -59,9 +59,8 @@ int Queue::Enqueue(ElementPtr element)
         return 0;
     }
 
-    memcpy(_elements + _writeIndex * (size_t)_elementSize, element, _elementSize);
-
-    _writeIndex = (_writeIndex + 1) % _maxElementCount;
+    memcpy(_elements + _writeIndex * (size_t) _elementSize, element, _elementSize);
+    IncrementIndex(&_writeIndex);
 
     _elementCount++;
 
@@ -83,11 +82,16 @@ int Queue::Dequeue(ElementPtr element)
         return 0;
     }
 
-    memcpy(element, _elements + _readIndex * (size_t)_elementSize, _elementSize);
-    _readIndex = (_readIndex + 1) % _maxElementCount;
+    memcpy(element, _elements + _readIndex * (size_t) _elementSize, _elementSize);
+    IncrementIndex(&_readIndex);
 
     _elementCount--;
 
     (void)pthread_mutex_unlock(&_mutex);
     return 1;
+}
+
+void Queue::IncrementIndex(int* index)
+{
+    *index = (*index + 1) % _maxElementCount;
 }
