@@ -14,21 +14,24 @@ Queue* oddQueue = NULL;
 
 volatile int shouldExit = 0;
 
-int Initialize()
+bool Initialize()
 {
     sourceQueue = new Queue(size, sizeof(int));
     if (!sourceQueue) {
-        return 0;
+        return false;
     }
+
     evenQueue = new Queue(size / 2, sizeof(int));
     if (!evenQueue) {
-        return 0;
+        return false;
     }
+    
     oddQueue = new Queue(size / 2, sizeof(int));
     if (!oddQueue) {
-        return 0;
+        return false;
     }
-    return 1;
+
+    return true;
 }
 
 void Release()
@@ -89,57 +92,65 @@ void* ConsumerMethod(void* arg)
     return NULL;
 }
 
-int main()
+void RunThreads()
 {
+    Thread producerThread(ProducerMethod, NULL);
+    Thread consumer1Thread(ConsumerMethod, NULL);
+    Thread consumer2Thread(ConsumerMethod, NULL);
+
+    producerThread.Join();
+    consumer1Thread.Join();
+    consumer2Thread.Join();
+}
+
+bool IsPassed()
+{
+    int evenSize = evenQueue->GetSize();
+    int oddSize = oddQueue->GetSize();
+
+    bool passed =
+        evenSize == (size_t)(size / 2) &&
+        oddSize == (size_t)(size / 2);
+
+    if (!passed)
+    {
+        return false;
+    }
+
     int sum = 0;
     int value = 0;
-    int passed = 0;
-    int result = 0;
 
+    for (int i = 0; i < evenSize; i++)
+    {
+        evenQueue->Dequeue(&value);
+        sum += value;
+    }
+
+    for (int i = 0; i < oddSize; i++)
+    {
+        oddQueue->Dequeue(&value);
+        sum += value;
+    }
+
+    if (sum != (0 + size - 1) * size / 2) {
+        return false;
+    }
+
+    return true;
+}
+
+int main()
+{
     int ok = Initialize();
     if (! ok) {
         goto Error;
     }
 
-    {
-        Thread producerThread(ProducerMethod, NULL);
-        Thread consumer1Thread(ConsumerMethod, NULL);
-        Thread consumer2Thread(ConsumerMethod, NULL);
+    RunThreads();
 
-        producerThread.Join();
-        consumer1Thread.Join();
-        consumer2Thread.Join();
-    }
-
-    passed =
-        evenQueue->GetSize() == (size_t)(size / 2) &&
-        oddQueue->GetSize() == (size_t)(size / 2);
-
-    if (passed)
-    {
-        int evenSize = evenQueue->GetSize();
-        for (int i = 0; i < evenSize; i++)
-        {
-            evenQueue->Dequeue(&value);
-            sum += value;
-        }
-
-        int oddSize = oddQueue->GetSize();
-        for (int i = 0; i < oddSize; i++)
-        {
-            oddQueue->Dequeue(&value);
-            sum += value;
-        }
-
-        if (sum != (0 + size - 1) * size / 2) {
-            passed = 0;
-        }
-    }
-
-    printf("=========== %s\n", passed ? "PASSED" : "FAILED");
+    printf("=========== %s\n", IsPassed() ? "PASSED" : "FAILED");
 
     Release();
-
     return EXIT_SUCCESS;
 
 Error:
