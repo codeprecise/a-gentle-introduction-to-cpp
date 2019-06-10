@@ -18,6 +18,6 @@ and to emphasize that the migration can be fairly straightforward if your code i
 
 ## Contents of this repository
 
-- The code for the walk through can be found in the Refactoring2Cpp folder.
+- The code for the C->C++ refactoring walk through can be found in the WalkThrough folder.
 - The code for the performance comparison can be found in the PerformanceComparison.
 - The CompileExplorer folder contains some snippets that will be discussed in the performance section. 
