@@ -18,7 +18,7 @@ Queue::Queue(int maxElementCount, int elementSize)
     _readIndex = 0;
 
     _elements = (char*)malloc(maxElementCount * (size_t) elementSize);
-    if (_elements == NULL)
+    if (_elements == nullptr)
     {
         (void)pthread_mutex_destroy(&_mutex);
     }
@@ -45,18 +45,18 @@ int Queue::GetSize()
     return count;
 }
 
-int Queue::Enqueue(ElementPtr element)
+bool Queue::Enqueue(ElementPtr element)
 {
     int result = pthread_mutex_lock(&_mutex);
     if (result != 0) {
-        return 0;
+        return false;
     }
 
     if (_elementCount == _maxElementCount)
     {
         (void)pthread_mutex_unlock(&_mutex);
 
-        return 0;
+        return false;
     }
 
     memcpy(_elements + _writeIndex * (size_t) _elementSize, element, _elementSize);
@@ -66,20 +66,20 @@ int Queue::Enqueue(ElementPtr element)
 
     (void)pthread_mutex_unlock(&_mutex);
 
-    return 1;
+    return true;
 }
 
-int Queue::Dequeue(ElementPtr element)
+bool Queue::Dequeue(ElementPtr element)
 {
     int result = pthread_mutex_lock(&_mutex);
     if (result != 0) {
-        return 0;
+        return false;
     }
 
     if (_elementCount == 0)
     {
         (void)pthread_mutex_unlock(&_mutex);
-        return 0;
+        return false;
     }
 
     memcpy(element, _elements + _readIndex * (size_t) _elementSize, _elementSize);
@@ -88,7 +88,7 @@ int Queue::Dequeue(ElementPtr element)
     _elementCount--;
 
     (void)pthread_mutex_unlock(&_mutex);
-    return 1;
+    return true;
 }
 
 void Queue::IncrementIndex(int* index)

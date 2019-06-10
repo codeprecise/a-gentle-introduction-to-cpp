@@ -12,8 +12,8 @@ public:
     ~Queue();
     
     int GetSize();
-    int Enqueue(ElementPtr element);
-    int Dequeue(ElementPtr element);
+    bool Enqueue(ElementPtr element);
+    bool Dequeue(ElementPtr element);
 
 private:
 
