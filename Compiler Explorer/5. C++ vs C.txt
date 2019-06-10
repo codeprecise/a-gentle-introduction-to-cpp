@@ -1,0 +1,37 @@
+//======  C 
+
+typedef struct Queue
+{
+    int size;
+} Queue;
+
+void InitializeQueue(Queue* q)
+{
+    q->size = 0;
+}
+
+void IncrementQueue(Queue* q)
+{
+    q->size++;
+}
+
+//======  C++ 
+
+class Queue
+{
+public:
+    Queue();
+    void Increment();
+
+    int size;
+};
+
+Queue::Queue() :
+    size(0)
+{
+}
+
+void Queue::Increment()
+{
+    size++;
+}

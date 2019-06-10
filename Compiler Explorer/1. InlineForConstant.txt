@@ -1,0 +1,9 @@
+int mul(int x, int y)
+{
+    return x * y;
+}
+
+int mul2(int value, int val)
+{
+    return mul(value, 2);
+}

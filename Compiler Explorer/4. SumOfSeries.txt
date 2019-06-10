@@ -1,0 +1,14 @@
+int sum(int size)
+{
+    int sum = 0;
+    for (int i = 0; i < size; i++)
+    {
+        sum += i;
+    }
+    return sum;
+}
+
+int sum20(int count)
+{
+    return sum(20);
+}
